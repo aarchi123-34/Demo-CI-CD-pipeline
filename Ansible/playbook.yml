@@ -1,0 +1,19 @@
+---
+- name: Beginner-Friendly EC2 Setup
+  hosts: ec2
+  become: yes
+
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+
+    - name: Install Python3 (required for Ansible)
+      apt:
+        name: python3
+        state: present
+
+    - name: Create workspace folder
+      file:
+        path: /home/ubuntu/workspace
+        state: directory
