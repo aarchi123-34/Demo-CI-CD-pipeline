@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Terraform Init & Apply') {
             steps {
                 dir('terraform') {
@@ -37,9 +38,10 @@ pipeline {
 
         stage('SonarCloud Scan') {
             steps {
-                // Replace YOUR_SONARCLOUD_TOKEN with the actual token
-                sh 'sonar-scanner -Dsonar.login='71619e0ac3f96ce595fb2c5e82f60ffe3d9b34bb'
+                // Use double quotes for Groovy string and single quotes inside shell
+                sh "sonar-scanner -Dsonar.login='71619e0ac3f96ce595fb2c5e82f60ffe3d9b34bb'"
             }
         }
+
     }
 }
