@@ -1,19 +1,19 @@
 ---
-- name: Beginner-Friendly EC2 Setup
-  hosts: ec2
+- name: Configure EC2 instance
+  hosts: webservers
   become: yes
-
   tasks:
-    - name: Update system packages
+    - name: Install Python3 (needed by Ansible)
+      raw: sudo apt-get update && sudo apt-get install -y python3
+      changed_when: false
+
+    - name: Install Nginx
       apt:
+        name: nginx
+        state: present
         update_cache: yes
 
-    - name: Install Python3 (required for Ansible)
-      apt:
-        name: python3
-        state: present
-
-    - name: Create workspace folder
-      file:
-        path: /home/ubuntu/workspace
-        state: directory
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
