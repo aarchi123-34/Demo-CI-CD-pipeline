@@ -1,35 +1,17 @@
 provider "aws" {
-  region = var.region
+  region = "us-east-1"
 }
-
-
-resource "aws_security_group" "ssh_sg" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 
 resource "aws_instance" "web" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = "my-key-pair"
-  security_groups = [aws_security_group.ssh_sg.name]
+  ami           = "ami-0c1fe732b5494dc14"  # Replace with Ubuntu AMI or Amazon Linux AMI
+  instance_type = "t3.micro"
+  key_name      = "my-key"                # Replace with your key pair name
 
   tags = {
-    Name = "Terraform-Ansible-EC2"
+    Name = "Demo-EC2"
   }
+}
+
+output "ec2_public_ip" {
+  value = aws_instance.web.public_ip
 }
