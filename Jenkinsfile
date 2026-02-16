@@ -5,14 +5,21 @@ pipeline {
 
         stage('Terraform Init & Apply') {
             steps {
-                script {
-                    // Initialize and apply Terraform in the root directory
+                dir('Terraform') { // match the folder name exactly (capital T)
+                    // Initialize Terraform
                     sh 'terraform init'
+
+                    // Apply Terraform configuration automatically
                     sh 'terraform apply -auto-approve'
 
-                    // Capture EC2 public IP directly into a variable
-                    ec2_ip = sh(script: "terraform output -raw ec2_public_ip", returnStdout: true).trim()
-                    echo "EC2 Public IP: ${ec2_ip}"
+                    // Capture EC2 public IP from Terraform output
+                    script {
+                        ec2_ip = sh(
+                            script: "terraform output -raw ec2_public_ip",
+                            returnStdout: true
+                        ).trim()
+                        echo "EC2 Public IP captured: ${ec2_ip}"
+                    }
                 }
             }
         }
@@ -20,9 +27,9 @@ pipeline {
         stage('Generate Ansible Inventory') {
             steps {
                 script {
-                    // Create inventory.ini with the captured IP
-                    inventory_content = "[webservers]\n${ec2_ip} ansible_user=ubuntu ansible_ssh_private_key_file=/path/to/your/key.pem"
-                    writeFile file: 'ansible/inventory.ini', text: inventory_content
+                    // Create Ansible inventory dynamically with the EC2 IP
+                    inventory_content = "[webservers]\n${ec2_ip} ansible_user=ec2-user ansible_ssh_private_key_file=/path/to/your/key.pem"
+                    writeFile file: 'Ansible/inventory.ini', text: inventory_content
                     echo "Generated Ansible inventory with EC2 IP"
                 }
             }
@@ -30,7 +37,8 @@ pipeline {
 
         stage('Run Ansible Playbook') {
             steps {
-                dir('ansible') {
+                dir('Ansible') {
+                    // Execute your Ansible playbook
                     sh 'ansible-playbook -i inventory.ini playbook.yml'
                 }
             }
@@ -38,8 +46,8 @@ pipeline {
 
         stage('SonarCloud Scan') {
             steps {
-                // SonarCloud login token
-                sh "sonar-scanner -Dsonar.login='71619e0ac3f96ce595fb2c5e82f60ffe3d9b34bb'"
+                // Run SonarCloud scan
+                sh "sonar-scanner -Dsonar.login='YOUR_SONARCLOUD_TOKEN'"
             }
         }
 
