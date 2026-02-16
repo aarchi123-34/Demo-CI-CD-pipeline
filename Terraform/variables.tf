@@ -3,10 +3,10 @@ variable "region" {
 }
 
 variable "instance_type" {
-  default = "t2.micro"
+  default = "t3.micro"
 }
 
 variable "ami_id" {
   # Ubuntu 22.04 LTS AMI
-  default = "ami-0a313d6098716f372"
+  default = "ami-0b6c6ebed2801a5cb"
 }
